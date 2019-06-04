@@ -1,7 +1,7 @@
 # Личный проект «Кексобукинг» [![Build status][travis-image]][travis-url]
 
 * Студент: [Владислава Калюга](https://up.htmlacademy.ru/javascript/17/user/969433).
-* Наставник: `Неизвестно`.
+* Наставник: [Александр Тимоновский](https://htmlacademy.ru/profile/id768125).
 
 ---
 
