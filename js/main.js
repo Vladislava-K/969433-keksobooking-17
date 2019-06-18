@@ -6,12 +6,10 @@ var LOCATION_X_MIN = 0;
 var LOCATION_WIDTH = 1200;
 var LOCATION_Y_MIN = 130;
 var LOCATION_Y_MAX = 630;
+var PIN_WIDTH = 50;
+var PIN_HEIGTH = 70;
 
-var randomSelection = function (arr) {
-  var rands = Math.floor(Math.random() * arr.length);
-  return (rands);
-};// Выбирает случайное значение из массива
-
+// Перемешивает массив используя тасование Фишера-Йетса
 var shuffle = function (arr) {
   var j;
   var temp;
@@ -24,18 +22,21 @@ var shuffle = function (arr) {
   }
 
   return arr;
-};// Перемешивает массив используя тасование Фишера-Йетса
+};
 
-var getRandomArbitary = function (min, max) {
-  var rand = Math.random() * (max - min) + min;
-  return rand;
-};// Возвращает случайное число между min и max
+// Выбирает случайное значение из массива
+var randomSelection = function (arr) {
+  var rands = Math.floor(Math.random() * arr.length);
+  return (rands);
+};
 
+// Возвращает случайное целое число между min и max
 var getRandomInt = function (min, max) {
   var rand = Math.floor(Math.random() * (max - min + 1)) + min;
   return rand;
-};// Возвращает случайное целое число между min и max
+};
 
+// Создает массив строк (начало строки + 0 + число от min до max + конец строки)
 var arrayStrings = function (string1, string2, min, max) {
   var myStrings = [];
   var temp = min;
@@ -46,44 +47,80 @@ var arrayStrings = function (string1, string2, min, max) {
   }
 
   return (myStrings);
-};// Создает массив строк
+};
 
-var arrMyAnnouncements = function (avatarArr, arrType, minX, maxX, minY, maxY, arrLength) {
-  var location = [];
+// Создает массив объектов авторов объявлений
+var authorAvatar = function (arrLength) {
+  var author = {};
+  var tempArr = arrayStrings('img/avatars/user', '.png', 1, arrLength);
+  for (var i = 0; i < arrLength; i++) {
+    author[i] = {avatar: tempArr[i]};
+  }
+
+  return author;
+};
+
+// Создает массив объектов с одним из фиксированных значений типа объявления
+var offerType = function (arr, arrLength) {
+  var offer = {};
+  for (var i = 0; i < arrLength; i++) {
+    var shuffleType = shuffle(arr);
+    var tempArrI = randomSelection(shuffleType);
+    offer[i] = {type: arr[tempArrI]};
+  }
+
+  return offer;
+};
+
+// Создает массив объектов с координатами метки объявления
+var locationType = function (minX, maxX, minY, maxY, arrLength) {
+  var location = {};
+  for (var i = 0; i < arrLength; i++) {
+    var tempArrX = getRandomInt(minX + PIN_WIDTH / 2, maxX - PIN_WIDTH / 2) - PIN_WIDTH / 2;
+    var tempArrY = getRandomInt(minY, maxY) - PIN_HEIGTH;
+    location[i] = {x: tempArrX, y: tempArrY};
+  }
+
+  return location;
+};
+
+// Создает массив объявлений из объектов с данными
+var arrMyAnnouncements = function (arrLength) {
+  var avatarArr = authorAvatar(arrLength);
+  var arrType = offerType(TYPE_ARR, arrLength);
+  var arrlocation = locationType(LOCATION_X_MIN, LOCATION_WIDTH, LOCATION_Y_MIN, LOCATION_Y_MAX, arrLength);
   var announcements = [];
   for (var i = 0; i < arrLength; i++) {
-    var shuffleType = shuffle(arrType);
-    var chosenType = randomSelection(shuffleType);
-    var locationX = getRandomInt(minX, maxX);
-    var locationY = getRandomArbitary(minY, maxY);
-    location[i] = {x: locationX, y: locationY};
-    announcements[i] = {author: avatarArr[i], offer: chosenType, location: location[i]};
+    announcements[i] = {author: avatarArr[i], offer: arrType[i], location: arrlocation[i]};
   }
 
   return (announcements);
-};// Создает массив объявлений из объектов с данными
+};
 
-var arrayAvatar = arrayStrings('img/avatars/user', '.png', 1, LENGTH_ANNOUNCEMENTS_ARR);
-var arrayAnnouncements = arrMyAnnouncements(arrayAvatar, TYPE_ARR, LOCATION_X_MIN, LOCATION_WIDTH, LOCATION_Y_MIN, LOCATION_Y_MAX, LENGTH_ANNOUNCEMENTS_ARR);
-
-document.querySelector('.map').classList.remove('.map--faded');
-
-var similarListElement = document.querySelector('.map__pins');//  Аналогичные элементы списка
-var similarPinTemplate = document.querySelector('#pin').content.querySelector('.map__pin');//  Итоговую разметку метки .map__pin берем из шаблона #pin
-
+//  функция создания DOM-элемента на основе JS-объекта
 var renderPin = function (pin) {
+  document.querySelector('.map').classList.remove('map--faded');
+
+  var similarPinTemplate = document.querySelector('#pin').content.querySelector('.map__pin');//  Итоговую разметку метки .map__pin берем из шаблона #pin
   var pinElement = similarPinTemplate.cloneNode(true);
 
-  pinElement.querySelector('.map__pin').style.left = pin.location.x + 'px';
-  pinElement.querySelector('.map__pin').style.top = pin.location.y + 'px';
-  pinElement.querySelector('.map__pin').querySelector('img').src = pin.author;
-  pinElement.querySelector('.map__pin').querySelector('img').alt = 'Заголовок объявления';
+  pinElement.style.left = pin.location.x + 'px';
+  pinElement.style.top = pin.location.y + 'px';
+  pinElement.querySelector('img').src = pin.author.avatar;
+  pinElement.querySelector('img').alt = 'Заголовок объявления';
 
   return pinElement;
 };
 
-var fragment = document.createDocumentFragment();
-for (var i = 0; i < arrayAnnouncements.length; i++) {
-  fragment.appendChild(renderPin(arrayAnnouncements[i]));
-}
-similarListElement.appendChild(fragment);
+//  функция заполнения блока DOM-элементами на основе массива JS-объектов
+var fillingPin = function () {
+  var arrayAnnouncements = arrMyAnnouncements(LENGTH_ANNOUNCEMENTS_ARR);
+  var similarListElement = document.querySelector('.map__pins');//  Аналогичные элементы списка
+  var fragment = document.createDocumentFragment();
+  for (var i = 0; i < arrayAnnouncements.length; i++) {
+    fragment.appendChild(renderPin(arrayAnnouncements[i]));
+  }
+  similarListElement.appendChild(fragment);
+};
+
+fillingPin();
