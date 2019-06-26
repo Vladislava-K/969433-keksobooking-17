@@ -123,4 +123,89 @@ var fillingPin = function () {
   similarListElement.appendChild(fragment);
 };
 
-fillingPin();
+//  fillingPin();
+
+//  Элементы управления формы неактивны в исходном состоянии
+var initialState = function () {
+  document.querySelector('.map').classList.add('map--faded');
+  var adForm = document.querySelector('.ad-form');
+  var adFormInput = adForm.querySelectorAll('input');
+  var adFormSelect = adForm.querySelectorAll('select');
+
+  var mapFilters = document.querySelector('.map__filters');
+  var mapFiltersInput = mapFilters.querySelectorAll('input');
+  var mapFiltersSelect = mapFilters.querySelectorAll('select');
+
+  for (var i = 0; i < adFormInput.length; i++) {
+    adFormInput[i].setAttribute('disabled', 'disabled');
+  }
+
+  for (i = 0; i < adFormSelect.length; i++) {
+    adFormSelect[i].setAttribute('disabled', 'disabled');
+  }
+
+  document.querySelector('.map__filters').classList.add('map__filters--disabled');
+
+  for (i = 0; i < mapFiltersInput.length; i++) {
+    mapFiltersInput[i].setAttribute('disabled', 'disabled');
+  }
+
+  for (i = 0; i < mapFiltersSelect.length; i++) {
+    mapFiltersSelect[i].setAttribute('disabled', 'disabled');
+  }
+};
+
+initialState();
+
+//  Перевод страницы Букинга в активный режим
+var activeState = function () {
+  fillingPin();
+
+  //  document.querySelector('.map').classList.remove('map--faded');
+  document.querySelector('.ad-form').classList.remove('ad-form--disabled');
+
+  var adForm = document.querySelector('.ad-form');
+  var adFormInput = adForm.querySelectorAll('input');
+  var adFormSelect = adForm.querySelectorAll('select');
+
+  var mapFilters = document.querySelector('.map__filters');
+  var mapFiltersInput = mapFilters.querySelectorAll('input');
+  var mapFiltersSelect = mapFilters.querySelectorAll('select');
+
+  for (var i = 0; i < adFormInput.length; i++) {
+    adFormInput[i].removeAttribute('disabled');
+  }
+
+  for (i = 0; i < adFormSelect.length; i++) {
+    adFormSelect[i].removeAttribute('disabled');
+  }
+
+  document.querySelector('.map__filters').classList.remove('map__filters--disabled');
+
+  for (i = 0; i < mapFiltersInput.length; i++) {
+    mapFiltersInput[i].removeAttribute('disabled');
+  }
+
+  for (i = 0; i < mapFiltersSelect.length; i++) {
+    mapFiltersSelect[i].removeAttribute('disabled');
+  }
+};
+
+var mapPinMain = document.querySelector('.map__pin--main');
+mapPinMain.addEventListener('click', activeState);
+
+mapPinMain.addEventListener('mouseup', function () {
+  coordinatesAddress();
+});
+
+// координатами метки объявления
+var coordinatesAddress = function () {
+  var adForm = document.querySelector('.ad-form');
+
+  var target = event.target;
+  var targetTemp = target.parentElement;
+  var addressX = targetTemp.offsetLeft;
+  var addressY = targetTemp.offsetTop;
+  var addressCoordinates = (addressX + ', ' + addressY);
+  adForm.querySelector('#address').setAttribute('value', addressCoordinates);
+};
