@@ -128,12 +128,13 @@ var fillingPin = function () {
 
 // координаты метки объявления до активации страницы
 var initialCoordinatesAddress = function () {
-  var adForm = document.querySelector('.ad-form');
   var mapPinMain = document.querySelector('.map__pin--main');
 
   var addressX = mapPinMain.offsetLeft + mapPinMain.offsetWidth / 2;
   var addressY = mapPinMain.offsetTop - mapPinMain.offsetHeight / 2;
   var addressCoordinates = (addressX + ', ' + addressY);
+
+  var adForm = document.querySelector('.ad-form');
   adForm.querySelector('#address').setAttribute('value', addressCoordinates);
 };
 
@@ -216,12 +217,12 @@ mapPinMain.addEventListener('mouseup', function (evt) {
 
 // координаты метки объявления после активации страницы
 var coordinatesAddress = function (evt) {
-  var adForm = document.querySelector('.ad-form');
-
   var target = evt.target;
   var targetTemp = target.parentElement;
   var addressX = targetTemp.offsetLeft + targetTemp.offsetWidth / 2;
   var addressY = targetTemp.offsetTop - target.offsetHeight - MAIN_PIN_HEIGTH_AFTER;
   var addressCoordinates = (addressX + ', ' + addressY);
+
+  var adForm = document.querySelector('.ad-form');
   adForm.querySelector('#address').setAttribute('value', addressCoordinates);
 };
