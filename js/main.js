@@ -8,6 +8,7 @@ var LOCATION_Y_MIN = 130;
 var LOCATION_Y_MAX = 630;
 var PIN_WIDTH = 50;
 var PIN_HEIGTH = 70;
+var MAIN_PIN_HEIGTH_AFTER = 22;
 
 // Перемешивает массив используя тасование Фишера-Йетса
 var shuffle = function (arr) {
@@ -125,8 +126,21 @@ var fillingPin = function () {
 
 //  fillingPin();
 
+// координаты метки объявления до активации страницы
+var initialCoordinatesAddress = function () {
+  var adForm = document.querySelector('.ad-form');
+  var mapPinMain = document.querySelector('.map__pin--main');
+
+  var addressX = mapPinMain.offsetLeft + mapPinMain.offsetWidth / 2;
+  var addressY = mapPinMain.offsetTop - mapPinMain.offsetHeight / 2;
+  var addressCoordinates = (addressX + ', ' + addressY);
+  adForm.querySelector('#address').setAttribute('value', addressCoordinates);
+};
+
 //  Элементы управления формы неактивны в исходном состоянии
 var initialState = function () {
+  initialCoordinatesAddress();
+
   document.querySelector('.map').classList.add('map--faded');
   var adForm = document.querySelector('.ad-form');
   var adFormInput = adForm.querySelectorAll('input');
@@ -189,23 +203,25 @@ var activeState = function () {
   for (i = 0; i < mapFiltersSelect.length; i++) {
     mapFiltersSelect[i].removeAttribute('disabled');
   }
+
+  mapPinMain.removeEventListener('click', activeState);
 };
 
 var mapPinMain = document.querySelector('.map__pin--main');
 mapPinMain.addEventListener('click', activeState);
 
-mapPinMain.addEventListener('mouseup', function () {
-  coordinatesAddress();
+mapPinMain.addEventListener('mouseup', function (evt) {
+  coordinatesAddress(evt);
 });
 
-// координатами метки объявления
-var coordinatesAddress = function () {
+// координаты метки объявления после активации страницы
+var coordinatesAddress = function (evt) {
   var adForm = document.querySelector('.ad-form');
 
-  var target = event.target;
+  var target = evt.target;
   var targetTemp = target.parentElement;
-  var addressX = targetTemp.offsetLeft;
-  var addressY = targetTemp.offsetTop;
+  var addressX = targetTemp.offsetLeft + targetTemp.offsetWidth / 2;
+  var addressY = targetTemp.offsetTop - target.offsetHeight - MAIN_PIN_HEIGTH_AFTER;
   var addressCoordinates = (addressX + ', ' + addressY);
   adForm.querySelector('#address').setAttribute('value', addressCoordinates);
 };
