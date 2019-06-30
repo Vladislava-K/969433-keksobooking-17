@@ -137,11 +137,11 @@ var fillingPin = function () {
 
 // координаты метки объявления до активации страницы
 var initialCoordinatesAddress = function () {
-  var addressX = {};
-  var addressY = {};
-  addressX = {x: mapPinMain.offsetLeft + mapPinMain.offsetWidth / 2};
-  addressY = {y: mapPinMain.offsetTop - mapPinMain.offsetHeight / 2};
-  var addressCoordinates = (addressX.x + ', ' + addressY.y);
+  var address = {};
+  var addressX = mapPinMain.offsetLeft + mapPinMain.offsetWidth / 2;
+  var addressY = mapPinMain.offsetTop - mapPinMain.offsetHeight / 2;
+  address = {x: addressX, y: addressY};
+  var addressCoordinates = (address.x + ', ' + address.y);
 
   adForm.querySelector('#address').setAttribute('value', addressCoordinates);
 };
@@ -204,12 +204,12 @@ mapPinMain.addEventListener('click', activeState);
 
 // координаты метки объявления после активации страницы
 var coordinatesAddress = function () {
-  var addressX = {};
-  var addressY = {};
   var pinImg = mapPinMain.getElementsByTagName('img')[0];
-  addressX = {x: mapPin.offsetLeft + mapPin.offsetWidth / 2};
-  addressY = {y: mapPin.offsetTop - pinImg.offsetHeight - MAIN_PIN_HEIGTH_AFTER};
-  var addressCoordinates = (addressX.x + ', ' + addressY.y);
+  var address = {};
+  var addressX = mapPin.offsetLeft + mapPin.offsetWidth / 2;
+  var addressY = mapPin.offsetTop - pinImg.offsetHeight - MAIN_PIN_HEIGTH_AFTER;
+  address = {x: addressX, y: addressY};
+  var addressCoordinates = (address.x + ', ' + address.y);
 
   adForm.querySelector('#address').setAttribute('value', addressCoordinates);
 };
