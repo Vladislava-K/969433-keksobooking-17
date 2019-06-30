@@ -19,6 +19,7 @@ var mapFiltersInput = mapFilters.querySelectorAll('input');
 var mapFiltersSelect = mapFilters.querySelectorAll('select');
 
 var mapPinMain = document.querySelector('.map__pin--main');
+var mapPin = document.querySelector('.map__pin');
 
 // Перемешивает массив используя тасование Фишера-Йетса
 var shuffle = function (arr) {
@@ -136,9 +137,11 @@ var fillingPin = function () {
 
 // координаты метки объявления до активации страницы
 var initialCoordinatesAddress = function () {
-  var addressX = mapPinMain.offsetLeft + mapPinMain.offsetWidth / 2;
-  var addressY = mapPinMain.offsetTop - mapPinMain.offsetHeight / 2;
-  var addressCoordinates = (addressX + ', ' + addressY);
+  var addressX = {};
+  var addressY = {};
+  addressX = {x: mapPinMain.offsetLeft + mapPinMain.offsetWidth / 2};
+  addressY = {y: mapPinMain.offsetTop - mapPinMain.offsetHeight / 2};
+  var addressCoordinates = (addressX.x + ', ' + addressY.y);
 
   adForm.querySelector('#address').setAttribute('value', addressCoordinates);
 };
@@ -200,12 +203,13 @@ var activeState = function () {
 mapPinMain.addEventListener('click', activeState);
 
 // координаты метки объявления после активации страницы
-var coordinatesAddress = function (evt) {
-  var target = evt.target;
-  var targetTemp = target.parentElement;
-  var addressX = targetTemp.offsetLeft + targetTemp.offsetWidth / 2;
-  var addressY = targetTemp.offsetTop - target.offsetHeight - MAIN_PIN_HEIGTH_AFTER;
-  var addressCoordinates = (addressX + ', ' + addressY);
+var coordinatesAddress = function () {
+  var addressX = {};
+  var addressY = {};
+  var pinImg = mapPinMain.getElementsByTagName('img')[0];
+  addressX = {x: mapPin.offsetLeft + mapPin.offsetWidth / 2};
+  addressY = {y: mapPin.offsetTop - pinImg.offsetHeight - MAIN_PIN_HEIGTH_AFTER};
+  var addressCoordinates = (addressX.x + ', ' + addressY.y);
 
   adForm.querySelector('#address').setAttribute('value', addressCoordinates);
 };
