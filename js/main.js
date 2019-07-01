@@ -8,6 +8,18 @@ var LOCATION_Y_MIN = 130;
 var LOCATION_Y_MAX = 630;
 var PIN_WIDTH = 50;
 var PIN_HEIGTH = 70;
+var MAIN_PIN_HEIGTH_AFTER = 22;
+
+var adForm = document.querySelector('.ad-form');
+var adFormInput = adForm.querySelectorAll('input');
+var adFormSelect = adForm.querySelectorAll('select');
+
+var mapFilters = document.querySelector('.map__filters');
+var mapFiltersInput = mapFilters.querySelectorAll('input');
+var mapFiltersSelect = mapFilters.querySelectorAll('select');
+
+var mapPinMain = document.querySelector('.map__pin--main');
+var mapPin = document.querySelector('.map__pin');
 
 // Перемешивает массив используя тасование Фишера-Йетса
 var shuffle = function (arr) {
@@ -27,7 +39,7 @@ var shuffle = function (arr) {
 // Выбирает случайное значение из массива
 var randomSelection = function (arr) {
   var rands = Math.floor(Math.random() * arr.length);
-  return (rands);
+  return rands;
 };
 
 // Возвращает случайное целое число между min и max
@@ -46,7 +58,7 @@ var arrayStrings = function (string1, string2, min, max) {
     temp = temp + 1;
   }
 
-  return (myStrings);
+  return myStrings;
 };
 
 // Создает массив объектов авторов объявлений
@@ -94,7 +106,7 @@ var arrMyAnnouncements = function (arrLength) {
     announcements[i] = {author: avatarArr[i], offer: arrType[i], location: arrlocation[i]};
   }
 
-  return (announcements);
+  return announcements;
 };
 
 //  функция создания DOM-элемента на основе JS-объекта
@@ -123,4 +135,83 @@ var fillingPin = function () {
   similarListElement.appendChild(fragment);
 };
 
-fillingPin();
+// координаты метки объявления до активации страницы
+var initialCoordinatesAddress = function () {
+  var address = {};
+  var addressX = mapPinMain.offsetLeft + mapPinMain.offsetWidth / 2;
+  var addressY = mapPinMain.offsetTop - mapPinMain.offsetHeight / 2;
+  address = {x: addressX, y: addressY};
+  var addressCoordinates = (address.x + ', ' + address.y);
+
+  adForm.querySelector('#address').setAttribute('value', addressCoordinates);
+};
+
+//  Элементы управления формы неактивны в исходном состоянии
+var initialState = function () {
+  initialCoordinatesAddress();
+
+  document.querySelector('.map').classList.add('map--faded');
+
+  adFormInput.forEach(function (input) {
+    input.setAttribute('disabled', 'disabled');
+  });
+
+  adFormSelect.forEach(function (select) {
+    select.setAttribute('disabled', 'disabled');
+  });
+
+  document.querySelector('.map__filters').classList.add('map__filters--disabled');
+
+  mapFiltersInput.forEach(function (input) {
+    input.setAttribute('disabled', 'disabled');
+  });
+
+  mapFiltersSelect.forEach(function (select) {
+    select.setAttribute('disabled', 'disabled');
+  });
+};
+
+initialState();
+
+//  Перевод страницы Букинга в активный режим
+var activeState = function () {
+  fillingPin();
+
+  document.querySelector('.ad-form').classList.remove('ad-form--disabled');
+
+  adFormInput.forEach(function (input) {
+    input.removeAttribute('disabled');
+  });
+
+  adFormSelect.forEach(function (select) {
+    select.removeAttribute('disabled');
+  });
+
+  document.querySelector('.map__filters').classList.remove('map__filters--disabled');
+
+  mapFiltersInput.forEach(function (input) {
+    input.removeAttribute('disabled');
+  });
+
+  mapFiltersSelect.forEach(function (select) {
+    select.removeAttribute('disabled');
+  });
+
+  mapPinMain.removeEventListener('click', activeState);
+};
+
+mapPinMain.addEventListener('click', activeState);
+
+// координаты метки объявления после активации страницы
+var coordinatesAddress = function () {
+  var pinImg = mapPinMain.getElementsByTagName('img')[0];
+  var address = {};
+  var addressX = mapPin.offsetLeft + mapPin.offsetWidth / 2;
+  var addressY = mapPin.offsetTop - pinImg.offsetHeight - MAIN_PIN_HEIGTH_AFTER;
+  address = {x: addressX, y: addressY};
+  var addressCoordinates = (address.x + ', ' + address.y);
+
+  adForm.querySelector('#address').setAttribute('value', addressCoordinates);
+};
+
+mapPinMain.addEventListener('mouseup', coordinatesAddress);
