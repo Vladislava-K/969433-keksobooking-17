@@ -141,7 +141,7 @@ var initialCoordinatesAddress = function () {
   var addressX = mapPinMain.offsetLeft + mapPinMain.offsetWidth / 2;
   var addressY = mapPinMain.offsetTop - mapPinMain.offsetHeight / 2;
   address = {x: addressX, y: addressY};
-  var addressCoordinates = (address.x + ', ' + address.y);
+  var addressCoordinates = (parseInt(address.x, 10) + ', ' + parseInt(address.y, 10));
 
   adForm.querySelector('#address').setAttribute('value', addressCoordinates);
 };
@@ -151,6 +151,7 @@ var initialState = function () {
   initialCoordinatesAddress();
 
   document.querySelector('.map').classList.add('map--faded');
+  document.querySelector('.ad-form').classList.add('ad-form--disabled');
 
   adFormInput.forEach(function (input) {
     input.setAttribute('disabled', 'disabled');
@@ -198,6 +199,9 @@ var activeState = function () {
   });
 
   mapPinMain.removeEventListener('click', activeState);
+
+  typePriceHouseChange();
+  initialPlaces();
 };
 
 mapPinMain.addEventListener('click', activeState);
@@ -209,9 +213,109 @@ var coordinatesAddress = function () {
   var addressX = mapPin.offsetLeft + mapPin.offsetWidth / 2;
   var addressY = mapPin.offsetTop - pinImg.offsetHeight - MAIN_PIN_HEIGTH_AFTER;
   address = {x: addressX, y: addressY};
-  var addressCoordinates = (address.x + ', ' + address.y);
+  var addressCoordinates = (parseInt(address.x, 10) + ', ' + parseInt(address.y, 10));
 
   adForm.querySelector('#address').setAttribute('value', addressCoordinates);
 };
 
 mapPinMain.addEventListener('mouseup', coordinatesAddress);
+
+// Выбор минимальной цены по типу жилья
+var typePriceHouseChange = function () {
+  var viewPrice = adForm.querySelector('#price');
+
+  var priceType = {
+    bungalo: 0,
+    flat: 1000,
+    house: 5000,
+    palace: 10000
+  };
+
+  viewPrice.min = priceType[housingType.value];
+  viewPrice.placeholder = priceType[housingType.value];
+};
+
+var housingType = adForm.querySelector('#type');
+housingType.addEventListener('change', typePriceHouseChange);
+
+// синхронизация времени заезда и выезда
+var dataTimeIn = adForm.querySelector('#timein');
+var dataTimeOut = adForm.querySelector('#timeout');
+
+var synchronTimeIn = function () {
+  dataTimeOut.value = dataTimeIn.value;
+};
+
+var synchronTimeOut = function () {
+  dataTimeIn.value = dataTimeOut.value;
+};
+
+dataTimeIn.addEventListener('change', synchronTimeIn);
+dataTimeOut.addEventListener('change', synchronTimeOut);
+
+// Синхронизация полей «Количество мест» и «Количество комнат»
+var roomNumberField = adForm.querySelector('#room_number');
+var capacityField = adForm.querySelector('#capacity');
+var capacityOptions = Array.from(capacityField.options);
+
+// Назначим исходные значения поля capacity (Количество мест)
+var initialPlaces = function () {
+  capacityOptions[0].disabled = true;
+  capacityOptions[1].disabled = true;
+  capacityOptions[2].disabled = false;
+  capacityOptions[3].disabled = true;
+
+  capacityField.value = capacityOptions[2].value;
+};
+
+// Синхронизируем количество комнат и количество мест
+var dataRoomPlaces = function (evt) {
+  if (evt.target.value === '1') {
+    capacityOptions[0].disabled = true;
+    capacityOptions[1].disabled = true;
+    capacityOptions[2].disabled = false;
+    capacityOptions[3].disabled = true;
+  } else if (evt.target.value === '2') {
+    capacityOptions[0].disabled = true;
+    capacityOptions[1].disabled = false;
+    capacityOptions[2].disabled = false;
+    capacityOptions[3].disabled = true;
+  } else if (evt.target.value === '3') {
+    capacityOptions[0].disabled = false;
+    capacityOptions[1].disabled = false;
+    capacityOptions[2].disabled = false;
+    capacityOptions[3].disabled = true;
+  } else if (evt.target.value === '100') {
+    capacityOptions[0].disabled = true;
+    capacityOptions[1].disabled = true;
+    capacityOptions[2].disabled = true;
+    capacityOptions[3].disabled = false;
+  }
+};
+
+roomNumberField.addEventListener('change', dataRoomPlaces);
+
+// При попытке отправить форму неверно заполненные поля подсвечиваются красной рамкой
+var isMyValid = function () {
+  var isValid = function (input) {
+    if (input.checkValidity() === true) {
+      input.style.boxShadow = 'none';
+    }
+  };
+
+  var isInvalid = function (input) {
+    if (input.checkValidity() === false) {
+      input.style.boxShadow = '0 0 2px 2px red';
+    } else {
+      adForm.querySelector('#title').addEventListener('input', isValid(adForm.querySelector('#title')));
+      adForm.querySelector('#title').addEventListener('input', isValid(adForm.querySelector('#price')));
+    }
+  };
+
+  adForm.querySelector('.ad-form__submit').addEventListener('click', function () {
+    isInvalid(adForm.querySelector('#title'));
+    isInvalid(adForm.querySelector('#price'));
+  });
+};
+
+isMyValid();
