@@ -201,7 +201,10 @@ var activeState = function () {
   mapPinMain.removeEventListener('click', activeState);
 
   typePriceHouseChange();
-  initialPlaces();
+
+  capacityNumber(roomNumber);
+
+  inputInit();
 };
 
 mapPinMain.addEventListener('click', activeState);
@@ -242,80 +245,85 @@ housingType.addEventListener('change', typePriceHouseChange);
 var dataTimeIn = adForm.querySelector('#timein');
 var dataTimeOut = adForm.querySelector('#timeout');
 
-var synchronTimeIn = function () {
-  dataTimeOut.value = dataTimeIn.value;
+var synchronInputs = function (firstElement, secondElement) {
+  secondElement.value = firstElement.value;
 };
 
-var synchronTimeOut = function () {
-  dataTimeIn.value = dataTimeOut.value;
-};
+dataTimeIn.addEventListener('change', function () {
+  synchronInputs(dataTimeIn, dataTimeOut);
+});
 
-dataTimeIn.addEventListener('change', synchronTimeIn);
-dataTimeOut.addEventListener('change', synchronTimeOut);
+dataTimeOut.addEventListener('change', function () {
+  synchronInputs(dataTimeOut, dataTimeIn);
+});
 
+//  Задание 20: доверяй, но проверяй. Часть 2 Рабочая ветка module8-task4
 // Синхронизация полей «Количество мест» и «Количество комнат»
-var roomNumberField = adForm.querySelector('#room_number');
-var capacityField = adForm.querySelector('#capacity');
-var capacityOptions = Array.from(capacityField.options);
-
-// Назначим исходные значения поля capacity (Количество мест)
-var initialPlaces = function () {
-  capacityOptions[0].disabled = true;
-  capacityOptions[1].disabled = true;
-  capacityOptions[2].disabled = false;
-  capacityOptions[3].disabled = true;
-
-  capacityField.value = capacityOptions[2].value;
+var InitialPlaces = {
+  1: [1],
+  2: [1, 2],
+  3: [1, 2, 3],
+  100: [0]
 };
 
-// Синхронизируем количество комнат и количество мест
-var dataRoomPlaces = function (evt) {
-  if (evt.target.value === '1') {
-    capacityOptions[0].disabled = true;
-    capacityOptions[1].disabled = true;
-    capacityOptions[2].disabled = false;
-    capacityOptions[3].disabled = true;
-  } else if (evt.target.value === '2') {
-    capacityOptions[0].disabled = true;
-    capacityOptions[1].disabled = false;
-    capacityOptions[2].disabled = false;
-    capacityOptions[3].disabled = true;
-  } else if (evt.target.value === '3') {
-    capacityOptions[0].disabled = false;
-    capacityOptions[1].disabled = false;
-    capacityOptions[2].disabled = false;
-    capacityOptions[3].disabled = true;
-  } else if (evt.target.value === '100') {
-    capacityOptions[0].disabled = true;
-    capacityOptions[1].disabled = true;
-    capacityOptions[2].disabled = true;
-    capacityOptions[3].disabled = false;
+var roomNumberSelect = adForm.querySelector('#room_number');
+var capacitySelect = adForm.querySelector('#capacity');
+
+var capacityOptions = capacitySelect.querySelectorAll('option');
+
+var roomNumber = roomNumberSelect.querySelector('option' + '[selected]').value;
+
+var capacityNumber = function (it) {
+  capacityOptions.forEach(function (elem) {
+    elem.selected = false;
+    elem.disabled = true;
+  });
+
+  InitialPlaces[it].forEach(function (tit) {
+    var capacitySel = capacitySelect.querySelector('option' + '[value="' + tit + '"]');
+    capacitySel.disabled = false;
+  });
+
+  if (it > 10) {
+    it = 0;
+  }
+
+  capacitySelect.querySelector('option' + '[value="' + it + '"]').selected = true;
+};
+
+var onRoomNumberSelectChange = function (evt) {
+  evt.target.setCustomValidity('');
+  var roomNum = evt.target.value;
+
+  capacityNumber(roomNum);
+};
+
+var onCapacitySelectChange = function (evt) {
+  evt.target.setCustomValidity('');
+};
+
+roomNumberSelect.addEventListener('change', onRoomNumberSelectChange);
+capacitySelect.addEventListener('change', onCapacitySelectChange);
+
+// При попытке отправить форму неверно заполненные поля подсвечиваются красной рамкой
+var inputValidate = function (evt) {
+  var input = evt.target;
+
+  if (input.checkValidity()) {
+    input.style.boxShadow = 'none';
+  } else {
+    input.style.boxShadow = '0 0 2px 2px red';
   }
 };
 
-roomNumberField.addEventListener('change', dataRoomPlaces);
+var inputInit = function () {
 
-// При попытке отправить форму неверно заполненные поля подсвечиваются красной рамкой
-var isMyValid = function () {
-  var isValid = function (input) {
-    if (input.checkValidity() === true) {
-      input.style.boxShadow = 'none';
-    }
-  };
-
-  var isInvalid = function (input) {
-    if (input.checkValidity() === false) {
-      input.style.boxShadow = '0 0 2px 2px red';
-    } else {
-      adForm.querySelector('#title').addEventListener('input', isValid(adForm.querySelector('#title')));
-      adForm.querySelector('#title').addEventListener('input', isValid(adForm.querySelector('#price')));
-    }
-  };
+  adForm.querySelector('#title').addEventListener('input', inputValidate);
+  adForm.querySelector('#price').addEventListener('input', inputValidate);
 
   adForm.querySelector('.ad-form__submit').addEventListener('click', function () {
-    isInvalid(adForm.querySelector('#title'));
-    isInvalid(adForm.querySelector('#price'));
+    if (!adForm.querySelector('#title').checkValidity() && !adForm.querySelector('#price').checkValidity()) {
+      return;
+    }
   });
 };
-
-isMyValid();
