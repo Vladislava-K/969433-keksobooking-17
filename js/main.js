@@ -141,7 +141,7 @@ var initialCoordinatesAddress = function () {
   var addressX = mapPinMain.offsetLeft + mapPinMain.offsetWidth / 2;
   var addressY = mapPinMain.offsetTop - mapPinMain.offsetHeight / 2;
   address = {x: addressX, y: addressY};
-  var addressCoordinates = (address.x + ', ' + address.y);
+  var addressCoordinates = (parseInt(address.x, 10) + ', ' + parseInt(address.y, 10));
 
   adForm.querySelector('#address').setAttribute('value', addressCoordinates);
 };
@@ -151,6 +151,7 @@ var initialState = function () {
   initialCoordinatesAddress();
 
   document.querySelector('.map').classList.add('map--faded');
+  document.querySelector('.ad-form').classList.add('ad-form--disabled');
 
   adFormInput.forEach(function (input) {
     input.setAttribute('disabled', 'disabled');
@@ -198,6 +199,12 @@ var activeState = function () {
   });
 
   mapPinMain.removeEventListener('click', activeState);
+
+  typePriceHouseChange();
+
+  capacityNumber(roomNumber);
+
+  inputInit();
 };
 
 mapPinMain.addEventListener('click', activeState);
@@ -209,9 +216,114 @@ var coordinatesAddress = function () {
   var addressX = mapPin.offsetLeft + mapPin.offsetWidth / 2;
   var addressY = mapPin.offsetTop - pinImg.offsetHeight - MAIN_PIN_HEIGTH_AFTER;
   address = {x: addressX, y: addressY};
-  var addressCoordinates = (address.x + ', ' + address.y);
+  var addressCoordinates = (parseInt(address.x, 10) + ', ' + parseInt(address.y, 10));
 
   adForm.querySelector('#address').setAttribute('value', addressCoordinates);
 };
 
 mapPinMain.addEventListener('mouseup', coordinatesAddress);
+
+// Выбор минимальной цены по типу жилья
+var typePriceHouseChange = function () {
+  var viewPrice = adForm.querySelector('#price');
+
+  var priceType = {
+    bungalo: 0,
+    flat: 1000,
+    house: 5000,
+    palace: 10000
+  };
+
+  viewPrice.min = priceType[housingType.value];
+  viewPrice.placeholder = priceType[housingType.value];
+};
+
+var housingType = adForm.querySelector('#type');
+housingType.addEventListener('change', typePriceHouseChange);
+
+// синхронизация времени заезда и выезда
+var dataTimeIn = adForm.querySelector('#timein');
+var dataTimeOut = adForm.querySelector('#timeout');
+
+var synchronInputs = function (firstElement, secondElement) {
+  secondElement.value = firstElement.value;
+};
+
+dataTimeIn.addEventListener('change', function () {
+  synchronInputs(dataTimeIn, dataTimeOut);
+});
+
+dataTimeOut.addEventListener('change', function () {
+  synchronInputs(dataTimeOut, dataTimeIn);
+});
+
+//  Задание 20: доверяй, но проверяй. Часть 2 Рабочая ветка module8-task4
+// Синхронизация полей «Количество мест» и «Количество комнат»
+var InitialPlaces = {
+  1: [1],
+  2: [1, 2],
+  3: [1, 2, 3],
+  100: [0]
+};
+
+var roomNumberSelect = adForm.querySelector('#room_number');
+var capacitySelect = adForm.querySelector('#capacity');
+
+var capacityOptions = capacitySelect.querySelectorAll('option');
+
+var roomNumber = roomNumberSelect.querySelector('option' + '[selected]').value;
+
+var capacityNumber = function (it) {
+  capacityOptions.forEach(function (elem) {
+    elem.selected = false;
+    elem.disabled = true;
+  });
+
+  InitialPlaces[it].forEach(function (tit) {
+    var capacitySel = capacitySelect.querySelector('option' + '[value="' + tit + '"]');
+    capacitySel.disabled = false;
+  });
+
+  if (it > 10) {
+    it = 0;
+  }
+
+  capacitySelect.querySelector('option' + '[value="' + it + '"]').selected = true;
+};
+
+var onRoomNumberSelectChange = function (evt) {
+  evt.target.setCustomValidity('');
+  var roomNum = evt.target.value;
+
+  capacityNumber(roomNum);
+};
+
+var onCapacitySelectChange = function (evt) {
+  evt.target.setCustomValidity('');
+};
+
+roomNumberSelect.addEventListener('change', onRoomNumberSelectChange);
+capacitySelect.addEventListener('change', onCapacitySelectChange);
+
+// При попытке отправить форму неверно заполненные поля подсвечиваются красной рамкой
+var inputValidate = function (evt) {
+  var input = evt.target;
+
+  if (input.checkValidity()) {
+    input.style.boxShadow = 'none';
+  } else {
+    input.style.boxShadow = '0 0 2px 2px red';
+  }
+};
+
+var inputInit = function () {
+
+  adForm.querySelector('#title').addEventListener('input', inputValidate);
+  adForm.querySelector('#price').addEventListener('input', inputValidate);
+
+  adForm.querySelector('.ad-form__submit').addEventListener('click', function () {
+    if (!adForm.querySelector('#title').checkValidity() && !adForm.querySelector('#price').checkValidity()) {
+      return;
+    }
+  });
+};
