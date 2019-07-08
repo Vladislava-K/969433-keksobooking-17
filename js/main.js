@@ -10,6 +10,18 @@ var PIN_WIDTH = 50;
 var PIN_HEIGTH = 70;
 var MAIN_PIN_HEIGTH_AFTER = 22;
 
+var MAIN_PIN_WIDTH = 65;
+var MAIN_PIN_HEIGTH = 62;
+var MIN = {
+  X: LOCATION_X_MIN,
+  Y: 130 - (MAIN_PIN_HEIGTH + MAIN_PIN_HEIGTH_AFTER)
+};
+var MAX = {
+  X: LOCATION_WIDTH - MAIN_PIN_WIDTH,
+  Y: 630 - (MAIN_PIN_HEIGTH + MAIN_PIN_HEIGTH_AFTER)
+};
+var isActive = false;
+
 var adForm = document.querySelector('.ad-form');
 var adFormInput = adForm.querySelectorAll('input');
 var adFormSelect = adForm.querySelectorAll('select');
@@ -19,7 +31,6 @@ var mapFiltersInput = mapFilters.querySelectorAll('input');
 var mapFiltersSelect = mapFilters.querySelectorAll('select');
 
 var mapPinMain = document.querySelector('.map__pin--main');
-var mapPin = document.querySelector('.map__pin');
 
 // Перемешивает массив используя тасование Фишера-Йетса
 var shuffle = function (arr) {
@@ -132,6 +143,7 @@ var fillingPin = function () {
   for (var i = 0; i < arrayAnnouncements.length; i++) {
     fragment.appendChild(renderPin(arrayAnnouncements[i]));
   }
+
   similarListElement.appendChild(fragment);
 };
 
@@ -139,7 +151,7 @@ var fillingPin = function () {
 var initialCoordinatesAddress = function () {
   var address = {};
   var addressX = mapPinMain.offsetLeft + mapPinMain.offsetWidth / 2;
-  var addressY = mapPinMain.offsetTop - mapPinMain.offsetHeight / 2;
+  var addressY = mapPinMain.offsetTop + mapPinMain.offsetHeight / 2;
   address = {x: addressX, y: addressY};
   var addressCoordinates = (parseInt(address.x, 10) + ', ' + parseInt(address.y, 10));
 
@@ -198,30 +210,100 @@ var activeState = function () {
     select.removeAttribute('disabled');
   });
 
-  mapPinMain.removeEventListener('click', activeState);
-
   typePriceHouseChange();
 
   capacityNumber(roomNumber);
 
   inputInit();
+
+  isActive = true;
 };
 
-mapPinMain.addEventListener('click', activeState);
-
-// координаты метки объявления после активации страницы
-var coordinatesAddress = function () {
-  var pinImg = mapPinMain.getElementsByTagName('img')[0];
+// Координаты метки объявления после активации страницы (пин с учетом острой стрелочки)
+var coordinatesAddress = function (left, top) {
   var address = {};
-  var addressX = mapPin.offsetLeft + mapPin.offsetWidth / 2;
-  var addressY = mapPin.offsetTop - pinImg.offsetHeight - MAIN_PIN_HEIGTH_AFTER;
+  var addressX = left + MAIN_PIN_WIDTH / 2;
+  var addressY = top + (MAIN_PIN_HEIGTH + MAIN_PIN_HEIGTH_AFTER);
   address = {x: addressX, y: addressY};
   var addressCoordinates = (parseInt(address.x, 10) + ', ' + parseInt(address.y, 10));
 
   adForm.querySelector('#address').setAttribute('value', addressCoordinates);
 };
 
-mapPinMain.addEventListener('mouseup', coordinatesAddress);
+//  Описываем полный цикл Drag-and-drop для маркера
+// Устанавливаем границы
+var setBordersMap = function (min, max, current) {
+  var value = current;
+  if (current <= min) {
+    value = min;
+    return value;
+  }
+  if (current >= max) {
+    value = max;
+    return value;
+  }
+  return value;
+};
+
+// Тащим за mapPinMain и обрабатываем событие начала перетаскивания метки mousedown
+mapPinMain.addEventListener('mousedown', function (evt) {
+  activatePinDown(evt);
+});
+
+var activatePinDown = function (evt) {
+  evt.preventDefault();
+
+  //  Запомним координаты точки начала движения
+  var startCoords = {
+    x: evt.clientX,
+    y: evt.clientY
+  };
+
+  // При каждом движении мыши обновляем смещение относительно первоначальной точки, чтобы диалог смещался на необходимую величину.
+  var onMouseMove = function (moveEvt) {
+    moveEvt.preventDefault();
+
+    var shift = {
+      x: startCoords.x - moveEvt.clientX,
+      y: startCoords.y - moveEvt.clientY
+    };
+
+    startCoords = {
+      x: moveEvt.clientX,
+      y: moveEvt.clientY
+    };
+
+    var left = mapPinMain.offsetLeft - shift.x;
+    var top = mapPinMain.offsetTop - shift.y;
+
+    //  Проверяем соблюдение границ карты
+    var mainPinPosition = {
+      x: setBordersMap(MIN.X, MAX.X, parseInt(left, 10)),
+      y: setBordersMap(MIN.Y, MAX.Y, parseInt(top, 10))
+    };
+
+    mapPinMain.style.left = mainPinPosition.x + 'px';
+    mapPinMain.style.top = mainPinPosition.y + 'px';
+
+    coordinatesAddress(mainPinPosition.x, mainPinPosition.y);
+  };
+
+  // При отпускании кнопки мыши страница переходит в активный режим и нужно переставать слушать события движения мыши
+  var onMouseUp = function (upEvt) {
+    upEvt.preventDefault();
+
+    if (!isActive) {
+      activeState();
+    }
+
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+  };
+
+  // Добавим обработчики события передвижения мыши и отпускания кнопки мыши.
+  document.addEventListener('mousemove', onMouseMove);
+  document.addEventListener('mouseup', onMouseUp);
+};
 
 // Выбор минимальной цены по типу жилья
 var typePriceHouseChange = function () {
