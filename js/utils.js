@@ -1,13 +1,31 @@
 'use strict';
 
 (function () {
+  var ESC_KEYCODE = 27;
+  var ENTER_KEYCODE = 13;
+
+  var mapElement = document.querySelector('.map');
   var adForm = document.querySelector('.ad-form');
+  var mapFilters = document.querySelector('.map__filters');
+
   var adFormInput = adForm.querySelectorAll('input');
   var adFormSelect = adForm.querySelectorAll('select');
-  var mapFilters = document.querySelector('.map__filters');
+
   var mapFiltersInput = mapFilters.querySelectorAll('input');
   var mapFiltersSelect = mapFilters.querySelectorAll('select');
   var mapPinMain = document.querySelector('.map__pin--main');
+
+  var isEscEvent = function (evt, action) {
+    if (evt.keyCode === ESC_KEYCODE) {
+      action();
+    }
+  };
+
+  var isEnterEvent = function (evt, action) {
+    if (evt.keyCode === ENTER_KEYCODE) {
+      action();
+    }
+  };
 
   // Перемешивает массив используя тасование Фишера-Йетса
   var shuffle = function (arr) {
@@ -50,12 +68,16 @@
   };
 
   window.util = {
+    mapElement: mapElement,
     adForm: adForm,
+    mapFilters: mapFilters,
     adFormInput: adFormInput,
     adFormSelect: adFormSelect,
     mapFiltersInput: mapFiltersInput,
     mapFiltersSelect: mapFiltersSelect,
     mapPinMain: mapPinMain,
+    isEscEvent: isEscEvent,
+    isEnterEvent: isEnterEvent,
     shuffle: shuffle,
     randomSelection: randomSelection,
     getRandomInt: getRandomInt,

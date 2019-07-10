@@ -1,6 +1,8 @@
 'use strict';
 
 (function () {
+  var LOCATION_PIN_LEFT = 570;
+  var LOCATION_PIN_TOP = 375;
   var LOCATION_X_MIN = 0;
   var LOCATION_WIDTH = 1200;
   var MAIN_PIN_WIDTH = 65;
@@ -18,7 +20,21 @@
 
   var isActive = false;
 
-  // координаты метки объявления до активации страницы
+  // Активируем страницу - убираем класс .map--faded у блока map
+  var showMapElement = function () {
+    window.util.mapElement.classList.remove('map--faded');
+
+    window.backend.load(window.pin.fillingPin, window.popup.renderErrorMessage);
+  };
+
+  //  Неактивное состояние страницы
+  var disableMapElement = function () {
+    window.util.mapElement.classList.add('map--faded');
+
+    window.pin.removePins();
+  };
+
+  // Координаты метки главного объявления в неактивном состоянии
   var initialCoordinatesAddress = function () {
     var address = {};
     var addressX = window.util.mapPinMain.offsetLeft + window.util.mapPinMain.offsetWidth / 2;
@@ -31,63 +47,22 @@
 
   //  Элементы управления формы неактивны в исходном состоянии
   var initialState = function () {
+    isActive = false;
+
+    disableMapElement();
+    window.form.deactivateForm();
+    window.filter.deactivateFilter();
+
     initialCoordinatesAddress();
-
-    document.querySelector('.map').classList.add('map--faded');
-    document.querySelector('.ad-form').classList.add('ad-form--disabled');
-
-    window.util.adFormInput.forEach(function (input) {
-      input.setAttribute('disabled', 'disabled');
-    });
-
-    window.util.adFormSelect.forEach(function (select) {
-      select.setAttribute('disabled', 'disabled');
-    });
-
-    document.querySelector('.map__filters').classList.add('map__filters--disabled');
-
-    window.util.mapFiltersInput.forEach(function (input) {
-      input.setAttribute('disabled', 'disabled');
-    });
-
-    window.util.mapFiltersSelect.forEach(function (select) {
-      select.setAttribute('disabled', 'disabled');
-    });
   };
-
-  initialState();
 
   //  Перевод страницы Букинга в активный режим
   var activeState = function () {
-    window.pin.fillingPin();
-
-    document.querySelector('.ad-form').classList.remove('ad-form--disabled');
-
-    window.util.adFormInput.forEach(function (input) {
-      input.removeAttribute('disabled');
-    });
-
-    window.util.adFormSelect.forEach(function (select) {
-      select.removeAttribute('disabled');
-    });
-
-    document.querySelector('.map__filters').classList.remove('map__filters--disabled');
-
-    window.util.mapFiltersInput.forEach(function (input) {
-      input.removeAttribute('disabled');
-    });
-
-    window.util.mapFiltersSelect.forEach(function (select) {
-      select.removeAttribute('disabled');
-    });
-
-    window.form.typePriceHouseChange();
-
-    window.form.capacityNumber(window.form.roomNumber);
-
-    window.form.inputInit();
-
     isActive = true;
+
+    showMapElement();
+    window.form.activateForm();
+    window.filter.activateFilter();
   };
 
   // Координаты метки объявления после активации страницы (пин с учетом острой стрелочки)
@@ -176,9 +151,14 @@
     document.addEventListener('mouseup', onMouseUp);
   };
 
+  initialState();
+
   window.map = {
+    LOCATION_PIN_LEFT: LOCATION_PIN_LEFT,
+    LOCATION_PIN_TOP: LOCATION_PIN_TOP,
     LOCATION_X_MIN: LOCATION_X_MIN,
     LOCATION_WIDTH: LOCATION_WIDTH,
-    isActive: isActive
+    isActive: isActive,
+    initialState: initialState
   };
 })();
