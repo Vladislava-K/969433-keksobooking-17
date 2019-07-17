@@ -55,6 +55,13 @@
     });
   };
 
+  //  Активируем все <fieldset> формы заполнения информации об объявлении - убираем атрибут disabled
+  var activeAdFormFieldset = function () {
+    window.util.adFormFieldset.forEach(function (fieldset) {
+      fieldset.disabled = false;
+    });
+  };
+
   //  Неактивное состояние всех <input> формы
   var disableAdFormInput = function () {
     window.util.adFormInput.forEach(function (input) {
@@ -66,6 +73,13 @@
   var disableAdFormSelect = function () {
     window.util.adFormInput.forEach(function (select) {
       select.setAttribute('disabled', 'disabled');
+    });
+  };
+
+  //  Неактивное состояние всех <fieldset> формы
+  var disableAdFormFieldset = function () {
+    window.util.adFormInput.forEach(function (fieldset) {
+      fieldset.disabled = true;
     });
   };
 
@@ -154,6 +168,9 @@
     window.util.adForm.reset();
     viewTitle.value = '';
     viewPrice.value = '';
+    viewTitle.style.boxShadow = 'none';
+    viewPrice.style.boxShadow = 'none';
+    resetBtn.style.boxShadow = 'none';
 
     window.util.mapFilters.reset();
 
@@ -174,6 +191,7 @@
     activeAdForm();
     activeAdFormInput();
     activeAdFormSelect();
+    activeAdFormFieldset();
     typePriceHouseChange();
     capacityNumber(roomNumber);
     inputInit();
@@ -193,6 +211,7 @@
     disableAdForm();
     disableAdFormInput();
     disableAdFormSelect();
+    disableAdFormFieldset();
 
     housingType.removeEventListener('change', typePriceHouseChange);
 

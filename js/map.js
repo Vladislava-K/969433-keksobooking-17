@@ -24,7 +24,7 @@
   var showMapElement = function () {
     window.util.mapElement.classList.remove('map--faded');
 
-    window.backend.load(window.pin.fillingPin, window.popup.renderErrorMessage);
+    window.debounce(window.backend.load(window.pin.successHandler, window.popup.renderErrorMessage));
   };
 
   //  Неактивное состояние страницы
@@ -62,7 +62,6 @@
 
     showMapElement();
     window.form.activateForm();
-    window.filter.activateFilter();
   };
 
   // Координаты метки объявления после активации страницы (пин с учетом острой стрелочки)

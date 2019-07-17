@@ -10,10 +10,15 @@
 
   var adFormInput = adForm.querySelectorAll('input');
   var adFormSelect = adForm.querySelectorAll('select');
+  var adFormFieldset = document.querySelectorAll('.ad-form__element');
 
   var mapFiltersInput = mapFilters.querySelectorAll('input');
   var mapFiltersSelect = mapFilters.querySelectorAll('select');
+  var mapFiltersFieldset = document.querySelector('#housing-features');
+
   var mapPinMain = document.querySelector('.map__pin--main');
+
+  var ads = [];
 
   var isEscEvent = function (evt, action) {
     if (evt.keyCode === ESC_KEYCODE) {
@@ -73,9 +78,12 @@
     mapFilters: mapFilters,
     adFormInput: adFormInput,
     adFormSelect: adFormSelect,
+    adFormFieldset: adFormFieldset,
     mapFiltersInput: mapFiltersInput,
     mapFiltersSelect: mapFiltersSelect,
+    mapFiltersFieldset: mapFiltersFieldset,
     mapPinMain: mapPinMain,
+    ads: ads,
     isEscEvent: isEscEvent,
     isEnterEvent: isEnterEvent,
     shuffle: shuffle,
