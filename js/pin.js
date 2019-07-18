@@ -24,12 +24,20 @@
 
     var fragment = document.createDocumentFragment();
 
-    var newPins = ads.slice(0, LENGTH_ANNOUNCEMENTS_ARR);
+    var newPins = ads.slice(0, window.filter.PINS_LIMIT);
     newPins.forEach(function (itemAds) {
       fragment.appendChild(renderPin(itemAds));
     });
 
     similarListPinElement.appendChild(fragment);
+  };
+
+  var successHandler = function (data) {
+    window.util.ads = data.slice(0);
+
+    window.filter.activateFilter();
+
+    return data.slice(0, window.util.PINS_LIMIT);
   };
 
   //  Функция удаления меток с карты
@@ -41,8 +49,10 @@
   };
 
   window.pin = {
+    LENGTH_ANNOUNCEMENTS_ARR: LENGTH_ANNOUNCEMENTS_ARR,
     mainElement: mainElement,
     fillingPin: fillingPin,
+    successHandler: successHandler,
     removePins: removePins
   };
 })();
