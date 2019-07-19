@@ -15,6 +15,14 @@
     pinElement.querySelector('img').src = pin.author.avatar;
     pinElement.querySelector('img').alt = 'Заголовок объявления';
 
+    var onPinClick = function () {
+      window.popup.removeCard();
+
+      window.popup.renderCard(pin);
+    };
+
+    pinElement.addEventListener('click', onPinClick);
+
     return pinElement;
   };
 

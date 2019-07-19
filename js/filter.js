@@ -67,9 +67,10 @@
 
     window.pin.removePins();
 
+    window.popup.removeCard();
+
     window.pin.fillingPin(window.filterData);
   };
-
 
   var activateFilter = function () {
     onFilterChange();
