@@ -86,7 +86,7 @@
 
     var cardElement = similarCardTemplate.cloneNode(true);
 
-    // Проверка полей объявлений
+    // Проверка полей объявлений (Если данных для заполнения не хватает, соответствующий блок в карточке скрывается)
     if (ads.offer.title) {
       cardElement.querySelector('.popup__title').textContent = ads.offer.title;
     } else {
@@ -111,20 +111,34 @@
       cardElement.querySelector('.popup__type').remove();
     }
 
-    if (ads.offer.capacity) {
+    if (ads.offer.rooms && ads.offer.guests) {
       cardElement.querySelector('.popup__text--capacity').textContent = ads.offer.rooms + ' комнаты для ' + ads.offer.guests + ' гостей';
     } else {
       cardElement.querySelector('.popup__text--capacity').remove();
     }
 
-    if (ads.offer.time) {
-      cardElement.querySelector('.popup__text--time').textContent = 'Заезд после ' + ads.offer.checkin + ',' + ' выезд до ' + ads.offer.checkout;
+    if (ads.offer.checkin && ads.offer.checkout) {
+      cardElement.querySelector('.popup__text--time').textContent = 'Заезд после ' + ads.offer.checkin + ', выезд до ' + ads.offer.checkout;
     } else {
       cardElement.querySelector('.popup__text--time').remove();
     }
 
-    if (ads.offer.features) {
-      cardElement.querySelector('.popup__features').textContent = ads.offer.features;
+    var createFeatureFragment = function (adsFeature) {
+      cardElement.querySelector('.popup__features').innerHTML = '';
+      var featureFragment = document.createDocumentFragment();
+
+      adsFeature.offer.features.forEach(function (it) {
+        var featureItem = document.createElement('li');
+        featureItem.className = 'popup__feature popup__feature--' + it;
+
+        featureFragment.appendChild(featureItem);
+      });
+
+      return featureFragment;
+    };
+
+    if (ads.offer.features.length > 0) {
+      cardElement.querySelector('.popup__features').appendChild(createFeatureFragment(ads));
     } else {
       cardElement.querySelector('.popup__features').remove();
     }
@@ -135,11 +149,21 @@
       cardElement.querySelector('.popup__description').remove();
     }
 
-    if (ads.offer.photos) {
-      cardElement.querySelector('.popup__photos').textContent = '';
-      for (var f = 0; f < ads.offer.photos.length; f++) {
-        cardElement.querySelector('.popup__photos').insertAdjacentHTML('beforeend', '<img src="' + ads.offer.photos[f] + '" class="popup__photo" width="45" height="40" alt="Фотография жилья">');
-      }
+    var createPhotosFragment = function (adsPhotos) {
+      cardElement.querySelector('.popup__photos').innerHTML = '';
+      var photosFragment = document.createDocumentFragment();
+
+      adsPhotos.offer.photos.map(function (it) {
+        var popupPhotoItem = document.querySelector('#card').content.querySelector('.popup__photo').cloneNode(true);
+        popupPhotoItem.src = it;
+        photosFragment.appendChild(popupPhotoItem);
+      });
+
+      return photosFragment;
+    };
+
+    if (ads.offer.photos.length > 0) {
+      cardElement.querySelector('.popup__photos').appendChild(createPhotosFragment(ads));
     } else {
       cardElement.querySelector('.popup__photos').remove();
     }
