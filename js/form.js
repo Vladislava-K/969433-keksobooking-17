@@ -89,7 +89,7 @@
     viewPrice.placeholder = priceType[housingType.value];
   };
 
-  // синхронизация времени заезда и выезда
+  // Синхронизация времени заезда и выезда
   var synchronInputs = function (firstElement, secondElement) {
     secondElement.value = firstElement.value;
   };
