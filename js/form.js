@@ -196,6 +196,8 @@
     capacityNumber(roomNumber);
     inputInit();
 
+    window.image.activateImages();
+
     housingType.addEventListener('change', typePriceHouseChange);
 
     dataTimeIn.addEventListener('change', synchronTimeIn);
@@ -212,6 +214,9 @@
     disableAdFormInput();
     disableAdFormSelect();
     disableAdFormFieldset();
+
+    window.image.deactivateImages();
+    window.image.removeImages();
 
     housingType.removeEventListener('change', typePriceHouseChange);
 
