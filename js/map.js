@@ -45,6 +45,11 @@
     window.util.adForm.querySelector('#address').setAttribute('value', addressCoordinates);
   };
 
+  // Активируем по нажатию на Enter
+  var onCardEnterDown = function (evt) {
+    window.util.isEnterEvent(evt, activeState);
+  };
+
   //  Элементы управления формы неактивны в исходном состоянии
   var initialState = function () {
     isActive = false;
@@ -54,10 +59,14 @@
     window.filter.deactivateFilter();
 
     initialCoordinatesAddress();
+
+    document.addEventListener('keydown', onCardEnterDown);
   };
 
   //  Перевод страницы Букинга в активный режим
   var activeState = function () {
+    document.removeEventListener('keydown', onCardEnterDown);
+
     isActive = true;
 
     showMapElement();

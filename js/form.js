@@ -71,14 +71,14 @@
 
   //  Неактивное состояние всех <select> формы
   var disableAdFormSelect = function () {
-    window.util.adFormInput.forEach(function (select) {
+    window.util.adFormSelect.forEach(function (select) {
       select.setAttribute('disabled', 'disabled');
     });
   };
 
   //  Неактивное состояние всех <fieldset> формы
   var disableAdFormFieldset = function () {
-    window.util.adFormInput.forEach(function (fieldset) {
+    window.util.adFormFieldset.forEach(function (fieldset) {
       fieldset.disabled = true;
     });
   };
@@ -192,9 +192,12 @@
     activeAdFormInput();
     activeAdFormSelect();
     activeAdFormFieldset();
+
     typePriceHouseChange();
     capacityNumber(roomNumber);
     inputInit();
+
+    window.image.activateImages();
 
     housingType.addEventListener('change', typePriceHouseChange);
 
@@ -212,6 +215,9 @@
     disableAdFormInput();
     disableAdFormSelect();
     disableAdFormFieldset();
+
+    window.image.deactivateImages();
+    window.image.removeImages();
 
     housingType.removeEventListener('change', typePriceHouseChange);
 

@@ -6,6 +6,7 @@
 
   var mapElement = document.querySelector('.map');
   var adForm = document.querySelector('.ad-form');
+  var adFormDisable = document.querySelector('.ad-form--disabled');
   var mapFilters = document.querySelector('.map__filters');
 
   var adFormInput = adForm.querySelectorAll('input');
@@ -75,6 +76,7 @@
   window.util = {
     mapElement: mapElement,
     adForm: adForm,
+    adFormDisable: adFormDisable,
     mapFilters: mapFilters,
     adFormInput: adFormInput,
     adFormSelect: adFormSelect,

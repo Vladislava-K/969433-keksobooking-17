@@ -120,20 +120,9 @@
   var onFilterChange = function () {
     window.filteredData = window.util.ads.slice(0);
 
-    window.filterData = window.filteredData.filter(filtrationByType);
-    window.filterDataType = window.filterData;
-
-    window.filterData = window.filterDataType.filter(filtrationByPrice);
-    window.filterDataPrice = window.filterData;
-
-    window.filterData = window.filterDataPrice.filter(filtrationByRooms);
-    window.filterDataRooms = window.filterData;
-
-    window.filterData = window.filterDataRooms.filter(filtrationByGuests);
-    window.filterDataGuests = window.filterData;
-
-    window.filterData = window.filterDataGuests.filter(filtrationByFeatures);
-    //  window.filterDataFeatures = window.filterData;
+    window.filterData = window.filteredData.filter(function (item) {
+      return filtrationByType(item) && filtrationByPrice(item) && filtrationByRooms(item) && filtrationByGuests(item) && filtrationByFeatures(item);
+    });
 
     window.popup.removeCard();
     window.pin.removePins();
@@ -169,6 +158,7 @@
     disableMapFiltersFieldset();
 
     resetFilter();
+    window.popup.removeCard();
 
     window.util.mapFilters.removeEventListener('change', onFilterChange);
   };
