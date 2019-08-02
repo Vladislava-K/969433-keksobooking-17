@@ -121,15 +121,17 @@
     }
   };
 
+  var onInputInitValidate = function () {
+    if (!viewTitle.checkValidity() && !viewPrice.checkValidity()) {
+      return;
+    }
+  };
+
   var inputInit = function () {
     viewTitle.addEventListener('input', onInputValidate);
     viewPrice.addEventListener('input', onInputValidate);
 
-    window.util.adForm.querySelector('.ad-form__submit').addEventListener('click', function () {
-      if (!viewTitle.checkValidity() && !viewPrice.checkValidity()) {
-        return;
-      }
-    });
+    window.util.adForm.querySelector('.ad-form__submit').addEventListener('click', onInputInitValidate);
   };
 
   var onAdFormSubmit = function (evt) {
@@ -213,6 +215,7 @@
 
     viewTitle.removeEventListener('input', onInputValidate);
     viewPrice.removeEventListener('input', onInputValidate);
+    window.util.adForm.querySelector('.ad-form__submit').removeEventListener('click', onInputInitValidate);
 
     housingType.removeEventListener('change', onTypePriceHouseChange);
 
