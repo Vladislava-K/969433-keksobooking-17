@@ -36,7 +36,7 @@
   };
 
   //  Сообщение об успешной отправке формы
-  var renderPopupSuccess = function () {
+  var renderSuccessMessage = function () {
     var similarSuccessTemplate = document.querySelector('#success').content.querySelector('.success');//  Итоговую разметку .succes берем из шаблона #succes
 
     var successElement = similarSuccessTemplate.cloneNode(true);
@@ -72,7 +72,7 @@
   //  Создаем DOM-элементы объявлений
   var renderCard = function (ads) {
 
-    var typesOfOffers = {
+    var TypesOfOffers = {
       flat: 'Квартира',
       bungalo: 'Бунгало',
       house: 'Дом',
@@ -106,7 +106,7 @@
     }
 
     if (ads.offer.type) {
-      cardElement.querySelector('.popup__type').textContent = typesOfOffers[ads.offer.type];
+      cardElement.querySelector('.popup__type').textContent = TypesOfOffers[ads.offer.type];
     } else {
       cardElement.querySelector('.popup__type').remove();
     }
@@ -127,9 +127,9 @@
       cardElement.querySelector('.popup__features').innerHTML = '';
       var featureFragment = document.createDocumentFragment();
 
-      adsFeature.offer.features.forEach(function (it) {
+      adsFeature.offer.features.forEach(function (featureName) {
         var featureItem = document.createElement('li');
-        featureItem.className = 'popup__feature popup__feature--' + it;
+        featureItem.className = 'popup__feature popup__feature--' + featureName;
 
         featureFragment.appendChild(featureItem);
       });
@@ -153,9 +153,10 @@
       cardElement.querySelector('.popup__photos').innerHTML = '';
       var photosFragment = document.createDocumentFragment();
 
-      adsPhotos.offer.photos.map(function (it) {
+      adsPhotos.offer.photos.forEach(function (srcItem) {
         var popupPhotoItem = document.querySelector('#card').content.querySelector('.popup__photo').cloneNode(true);
-        popupPhotoItem.src = it;
+        popupPhotoItem.src = srcItem;
+
         photosFragment.appendChild(popupPhotoItem);
       });
 
@@ -205,7 +206,7 @@
 
   window.popup = {
     renderErrorMessage: renderErrorMessage,
-    renderPopupSuccess: renderPopupSuccess,
+    renderSuccessMessage: renderSuccessMessage,
     removeCard: removeCard,
     renderCard: renderCard
   };

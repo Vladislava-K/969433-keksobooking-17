@@ -1,6 +1,9 @@
 'use strict';
 
 (function () {
+  var SUCCESS_STATUS = 200;
+  var ERROR_TIMEOUT = 10000;
+
   var ServerUrl = {
     URL_POST: 'https://js.dump.academy/keksobooking',
     URL_GET: 'https://js.dump.academy/keksobooking/data'
@@ -10,7 +13,7 @@
     var xhr = new XMLHttpRequest();//  Вызываем функцию-конструктор
     xhr.responseType = 'json';//  Изменяем тип ответа на json
     xhr.addEventListener('load', function () {
-      if (xhr.status === 200) {
+      if (xhr.status === SUCCESS_STATUS) {
         onLoad(xhr.response);// Возвращает объект когда загружается вся страница
       } else {
         onError('Статус ответа: ' + xhr.status + ' ' + xhr.statusText + ' Пожалуйста, обновите страницу.');
@@ -22,7 +25,7 @@
     xhr.addEventListener('timeout', function () {
       onError('Запрос не успел выполниться за ' + xhr.timeout + 'мс. Пожалуйста, обновите страницу.');
     });
-    xhr.timeout = 10000;// Определяет количество миллисекунд, которое запрос будет выполняться, до того, как будет автоматически прерван (10с)
+    xhr.timeout = ERROR_TIMEOUT;// Определяет количество миллисекунд, которое запрос будет выполняться, до того, как будет автоматически прерван (10с)
     return xhr;
   };
 

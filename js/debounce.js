@@ -9,6 +9,7 @@
     if (lastTimeout) {
       window.clearTimeout(lastTimeout);
     }
-    lastTimeout = window.setTimeout(cb, DEBOUNCE_INTERVAL);
+
+    lastTimeout = setTimeout(cb, DEBOUNCE_INTERVAL);
   };
 })();
