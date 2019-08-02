@@ -24,64 +24,64 @@
   var showMapElement = function () {
     window.util.mapElement.classList.remove('map--faded');
 
-    window.debounce(window.backend.load(window.pin.successHandler, window.popup.renderErrorMessage));
+    window.backend.load(window.pin.successHandler, window.popup.renderErrorMessage);
   };
 
   //  Неактивное состояние страницы
   var disableMapElement = function () {
     window.util.mapElement.classList.add('map--faded');
 
-    window.pin.removePins();
+    window.pin.remove();
   };
 
   // Координаты метки главного объявления в неактивном состоянии
-  var initialCoordinatesAddress = function () {
+  var getInitialCoordinatesAddress = function () {
     var address = {};
     var addressX = window.util.mapPinMain.offsetLeft + window.util.mapPinMain.offsetWidth / 2;
     var addressY = window.util.mapPinMain.offsetTop + window.util.mapPinMain.offsetHeight / 2;
     address = {x: addressX, y: addressY};
     var addressCoordinates = (parseInt(address.x, 10) + ', ' + parseInt(address.y, 10));
 
-    window.util.adForm.querySelector('#address').setAttribute('value', addressCoordinates);
+    window.util.adForm.querySelector('#address').value = addressCoordinates;
   };
 
   // Активируем по нажатию на Enter
   var onCardEnterDown = function (evt) {
-    window.util.isEnterEvent(evt, activeState);
+    window.util.isEnterEvent(evt, isActiveState);
   };
 
   //  Элементы управления формы неактивны в исходном состоянии
-  var initialState = function () {
+  var getInitialState = function () {
     isActive = false;
 
     disableMapElement();
-    window.form.deactivateForm();
-    window.filter.deactivateFilter();
+    window.form.deactivate();
+    window.filter.deactivate();
 
-    initialCoordinatesAddress();
+    getInitialCoordinatesAddress();
 
-    document.addEventListener('keydown', onCardEnterDown);
+    window.util.mapPinMain.addEventListener('keydown', onCardEnterDown);
   };
 
   //  Перевод страницы Букинга в активный режим
-  var activeState = function () {
-    document.removeEventListener('keydown', onCardEnterDown);
+  var isActiveState = function () {
+    window.util.mapPinMain.removeEventListener('keydown', onCardEnterDown);
 
     isActive = true;
 
     showMapElement();
-    window.form.activateForm();
+    window.form.activate();
   };
 
   // Координаты метки объявления после активации страницы (пин с учетом острой стрелочки)
-  var coordinatesAddress = function (left, top) {
+  var getCoordinatesAddress = function (left, top) {
     var address = {};
     var addressX = left + MAIN_PIN_WIDTH / 2;
     var addressY = top + (MAIN_PIN_HEIGTH + MAIN_PIN_HEIGTH_AFTER);
     address = {x: addressX, y: addressY};
     var addressCoordinates = (parseInt(address.x, 10) + ', ' + parseInt(address.y, 10));
 
-    window.util.adForm.querySelector('#address').setAttribute('value', addressCoordinates);
+    window.util.adForm.querySelector('#address').value = addressCoordinates;
   };
 
   //  Описываем полный цикл Drag-and-drop для маркера
@@ -139,7 +139,7 @@
       window.util.mapPinMain.style.left = mainPinPosition.x + 'px';
       window.util.mapPinMain.style.top = mainPinPosition.y + 'px';
 
-      coordinatesAddress(mainPinPosition.x, mainPinPosition.y);
+      getCoordinatesAddress(mainPinPosition.x, mainPinPosition.y);
     };
 
     // При отпускании кнопки мыши страница переходит в активный режим и нужно переставать слушать события движения мыши
@@ -147,7 +147,7 @@
       upEvt.preventDefault();
 
       if (!isActive) {
-        activeState();
+        isActiveState();
       }
 
       document.removeEventListener('mousemove', onMouseMove);
@@ -159,7 +159,7 @@
     document.addEventListener('mouseup', onMouseUp);
   };
 
-  initialState();
+  getInitialState();
 
   window.map = {
     LOCATION_PIN_LEFT: LOCATION_PIN_LEFT,
@@ -167,6 +167,6 @@
     LOCATION_X_MIN: LOCATION_X_MIN,
     LOCATION_WIDTH: LOCATION_WIDTH,
     isActive: isActive,
-    initialState: initialState
+    getInitialState: getInitialState
   };
 })();

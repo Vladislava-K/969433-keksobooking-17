@@ -43,11 +43,10 @@
   var successHandler = function (data) {
     //  Если в объекте с описанием объявления отсутствует поле offer, то метка объявления не должна отображаться на карте
     window.util.ads = data.filter(function (num) {
-      num = num.offer ? true : false;
-      return num;
+      return num.offer;
     });
 
-    window.filter.activateFilter();
+    window.filter.activate();
 
     return data.slice(0, window.util.PINS_LIMIT);
   };
@@ -63,8 +62,8 @@
   window.pin = {
     LENGTH_ANNOUNCEMENTS_ARR: LENGTH_ANNOUNCEMENTS_ARR,
     mainElement: mainElement,
-    fillingPin: fillingPin,
+    filling: fillingPin,
     successHandler: successHandler,
-    removePins: removePins
+    remove: removePins
   };
 })();

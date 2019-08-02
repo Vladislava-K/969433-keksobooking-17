@@ -13,6 +13,7 @@
   var adFormSelect = adForm.querySelectorAll('select');
   var adFormFieldset = document.querySelectorAll('.ad-form__element');
 
+  var adFormFieldsetInput = document.querySelector('.features').querySelectorAll('input');
   var mapFiltersInput = mapFilters.querySelectorAll('input');
   var mapFiltersSelect = mapFilters.querySelectorAll('select');
   var mapFiltersFieldset = document.querySelector('#housing-features');
@@ -49,19 +50,19 @@
   };
 
   // Выбирает случайное значение из массива
-  var randomSelection = function (arr) {
-    var rands = Math.floor(Math.random() * arr.length);
-    return rands;
+  var getRandomSelection = function (arr) {
+    var randomValue = Math.floor(Math.random() * arr.length);
+    return randomValue;
   };
 
   // Возвращает случайное целое число между min и max
   var getRandomInt = function (min, max) {
-    var rand = Math.floor(Math.random() * (max - min + 1)) + min;
-    return rand;
+    var randomInteger = Math.floor(Math.random() * (max - min + 1)) + min;
+    return randomInteger;
   };
 
   // Создает массив строк (начало строки + 0 + число от min до max + конец строки)
-  var arrayStrings = function (string1, string2, min, max) {
+  var getArrayStrings = function (string1, string2, min, max) {
     var myStrings = [];
     var temp = min;
 
@@ -73,6 +74,31 @@
     return myStrings;
   };
 
+  var activateFields = function (fields) {
+    fields.forEach(function (item) {
+      item.disabled = false;
+    });
+  };
+
+  var deactivateFields = function (fields) {
+    fields.forEach(function (item) {
+      item.disabled = true;
+    });
+  };
+
+  var activateFeatures = function (evt) {
+    if (evt.keyCode === ENTER_KEYCODE) {
+      evt.preventDefault();
+
+      var input = evt.target;
+      if (input.checked) {
+        input.checked = false;
+      } else {
+        input.checked = true;
+      }
+    }
+  };
+
   window.util = {
     mapElement: mapElement,
     adForm: adForm,
@@ -81,6 +107,7 @@
     adFormInput: adFormInput,
     adFormSelect: adFormSelect,
     adFormFieldset: adFormFieldset,
+    adFormFieldsetInput: adFormFieldsetInput,
     mapFiltersInput: mapFiltersInput,
     mapFiltersSelect: mapFiltersSelect,
     mapFiltersFieldset: mapFiltersFieldset,
@@ -89,8 +116,11 @@
     isEscEvent: isEscEvent,
     isEnterEvent: isEnterEvent,
     shuffle: shuffle,
-    randomSelection: randomSelection,
+    getRandomSelection: getRandomSelection,
     getRandomInt: getRandomInt,
-    arrayStrings: arrayStrings
+    getArrayStrings: getArrayStrings,
+    activateFields: activateFields,
+    deactivateFields: deactivateFields,
+    activateFeatures: activateFeatures
   };
 })();

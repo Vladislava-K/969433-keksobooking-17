@@ -8,6 +8,8 @@
     100: [0]
   };
 
+  var VALUE_ROOMS_COMPARED = 10;
+
   var roomNumberSelect = window.util.adForm.querySelector('#room_number');
   var capacitySelect = window.util.adForm.querySelector('#capacity');
   var capacityOptions = capacitySelect.querySelectorAll('option');
@@ -15,7 +17,7 @@
 
   var viewPrice = window.util.adForm.querySelector('#price');
 
-  var priceType = {
+  var MinPriceTypes = {
     bungalo: 0,
     flat: 1000,
     house: 5000,
@@ -41,92 +43,67 @@
     window.util.adForm.classList.add('ad-form--disabled');
   };
 
-  //  Активируем все <input> формы заполнения информации об объявлении - убираем атрибут disabled
-  var activeAdFormInput = function () {
-    window.util.adFormInput.forEach(function (input) {
-      input.removeAttribute('disabled');
+  //  Состояние выбора дополнительных удобств в форме объявления при нажатии Enter
+  var onFeaturesFormEnterDown = function (evt) {
+    window.util.activateFeatures(evt);
+  };
+
+  var activateFormFeatures = function () {
+    window.util.adFormFieldsetInput.forEach(function (item) {
+      item.addEventListener('keydown', onFeaturesFormEnterDown);
     });
   };
 
-  //  Активируем все <select> формы заполнения информации об объявлении - убираем атрибут disabled
-  var activeAdFormSelect = function () {
-    window.util.adFormSelect.forEach(function (select) {
-      select.removeAttribute('disabled');
-    });
-  };
-
-  //  Активируем все <fieldset> формы заполнения информации об объявлении - убираем атрибут disabled
-  var activeAdFormFieldset = function () {
-    window.util.adFormFieldset.forEach(function (fieldset) {
-      fieldset.disabled = false;
-    });
-  };
-
-  //  Неактивное состояние всех <input> формы
-  var disableAdFormInput = function () {
-    window.util.adFormInput.forEach(function (input) {
-      input.setAttribute('disabled', 'disabled');
-    });
-  };
-
-  //  Неактивное состояние всех <select> формы
-  var disableAdFormSelect = function () {
-    window.util.adFormSelect.forEach(function (select) {
-      select.setAttribute('disabled', 'disabled');
-    });
-  };
-
-  //  Неактивное состояние всех <fieldset> формы
-  var disableAdFormFieldset = function () {
-    window.util.adFormFieldset.forEach(function (fieldset) {
-      fieldset.disabled = true;
+  var deactivateFormFeatures = function () {
+    window.util.adFormFieldsetInput.forEach(function (item) {
+      item.removeEventListener('keydown', onFeaturesFormEnterDown);
     });
   };
 
   // Выбор минимальной цены по типу жилья
-  var typePriceHouseChange = function () {
-    viewPrice.min = priceType[housingType.value];
-    viewPrice.placeholder = priceType[housingType.value];
+  var onTypePriceHouseChange = function () {
+    viewPrice.min = MinPriceTypes[housingType.value];
+    viewPrice.placeholder = MinPriceTypes[housingType.value];
   };
 
   // Синхронизация времени заезда и выезда
-  var synchronInputs = function (firstElement, secondElement) {
+  var synchronizateInputs = function (firstElement, secondElement) {
     secondElement.value = firstElement.value;
   };
 
-  var synchronTimeIn = function () {
-    synchronInputs(dataTimeIn, dataTimeOut);
+  var onSynchronizateTimeInChange = function () {
+    synchronizateInputs(dataTimeIn, dataTimeOut);
   };
 
-  var synchronTimeOut = function () {
-    synchronInputs(dataTimeOut, dataTimeIn);
+  var onSynchronizateTimeOutChange = function () {
+    synchronizateInputs(dataTimeOut, dataTimeIn);
   };
 
   //  Задание 20: доверяй, но проверяй. Часть 2 Рабочая ветка module8-task4
   // Синхронизация полей «Количество мест» и «Количество комнат»
-  var capacityNumber = function (it) {
+  var getCapacityNumber = function (valueSelectable) {
     capacityOptions.forEach(function (elem) {
       elem.selected = false;
       elem.disabled = true;
     });
 
-    InitialPlaces[it].forEach(function (tit) {
-      var capacitySel = capacitySelect.querySelector('option' + '[value="' + tit + '"]');
+    InitialPlaces[valueSelectable].forEach(function (valueAvailable) {
+      var capacitySel = capacitySelect.querySelector('option' + '[value="' + valueAvailable + '"]');
       capacitySel.disabled = false;
     });
 
-    if (it > 10) {
-      it = 0;
+    if (valueSelectable > VALUE_ROOMS_COMPARED) {
+      valueSelectable = 0;
     }
 
-    capacitySelect.querySelector('option' + '[value="' + it + '"]').selected = true;
+    capacitySelect.querySelector('option' + '[value="' + valueSelectable + '"]').selected = true;
   };
 
   var onRoomNumberSelectChange = function (evt) {
     evt.target.setCustomValidity('');
     var roomNum = evt.target.value;
 
-    capacityNumber(roomNum);
+    getCapacityNumber(roomNum);
   };
 
   var onCapacitySelectChange = function (evt) {
@@ -134,7 +111,7 @@
   };
 
   // При попытке отправить форму неверно заполненные поля подсвечиваются красной рамкой
-  var inputValidate = function (evt) {
+  var onInputValidate = function (evt) {
     var input = evt.target;
 
     if (input.checkValidity()) {
@@ -145,8 +122,8 @@
   };
 
   var inputInit = function () {
-    viewTitle.addEventListener('input', inputValidate);
-    viewPrice.addEventListener('input', inputValidate);
+    viewTitle.addEventListener('input', onInputValidate);
+    viewPrice.addEventListener('input', onInputValidate);
 
     window.util.adForm.querySelector('.ad-form__submit').addEventListener('click', function () {
       if (!viewTitle.checkValidity() && !viewPrice.checkValidity()) {
@@ -157,7 +134,7 @@
 
   var onAdFormSubmit = function (evt) {
     window.backend.save(new FormData(window.util.adForm), function () {
-      window.popup.renderPopupSuccess();
+      window.popup.renderSuccessMessage();
 
       resetPage();
     }, window.popup.renderErrorMessage);
@@ -170,68 +147,86 @@
     viewPrice.value = '';
     viewTitle.style.boxShadow = 'none';
     viewPrice.style.boxShadow = 'none';
-    resetBtn.style.boxShadow = 'none';
 
     window.util.mapFilters.reset();
 
     window.util.mapPinMain.style.left = window.map.LOCATION_PIN_LEFT + 'px';
     window.util.mapPinMain.style.top = window.map.LOCATION_PIN_TOP + 'px';
 
-    window.map.initialState();
-    typePriceHouseChange();
-    capacityNumber(roomNumber);
+    window.map.getInitialState();
+    onTypePriceHouseChange();
+    getCapacityNumber(roomNumber);
   };
 
-  var resetBtnPage = function (evt) {
+  var onResetBtnPage = function (evt) {
     evt.preventDefault();
     resetPage();
   };
 
   var activateForm = function () {
     activeAdForm();
-    activeAdFormInput();
-    activeAdFormSelect();
-    activeAdFormFieldset();
 
-    typePriceHouseChange();
-    capacityNumber(roomNumber);
+    //  Активируем все <input> формы заполнения информации об объявлении - убираем атрибут disabled
+    window.util.activateFields(window.util.adFormInput);
+
+    //  Активируем все <select> формы заполнения информации об объявлении - убираем атрибут disabled
+    window.util.activateFields(window.util.adFormSelect);
+
+    //  Активируем все <fieldset> формы заполнения информации об объявлении - убираем атрибут disabled
+    window.util.activateFields(window.util.adFormFieldset);
+
+    onTypePriceHouseChange();
+    getCapacityNumber(roomNumber);
     inputInit();
 
-    window.image.activateImages();
+    activateFormFeatures();
 
-    housingType.addEventListener('change', typePriceHouseChange);
+    window.image.activate();
 
-    dataTimeIn.addEventListener('change', synchronTimeIn);
-    dataTimeOut.addEventListener('change', synchronTimeOut);
+    housingType.addEventListener('change', onTypePriceHouseChange);
+
+    dataTimeIn.addEventListener('change', onSynchronizateTimeInChange);
+    dataTimeOut.addEventListener('change', onSynchronizateTimeOutChange);
 
     roomNumberSelect.addEventListener('change', onRoomNumberSelectChange);
     capacitySelect.addEventListener('change', onCapacitySelectChange);
     window.util.adForm.addEventListener('submit', onAdFormSubmit);
-    resetBtn.addEventListener('click', resetBtnPage);
+    resetBtn.addEventListener('click', onResetBtnPage);
   };
 
   var deactivateForm = function () {
     disableAdForm();
-    disableAdFormInput();
-    disableAdFormSelect();
-    disableAdFormFieldset();
 
-    window.image.deactivateImages();
-    window.image.removeImages();
+    //  Неактивное состояние всех <input> формы
+    window.util.deactivateFields(window.util.adFormInput);
 
-    housingType.removeEventListener('change', typePriceHouseChange);
+    //  Неактивное состояние всех <select> формы
+    window.util.deactivateFields(window.util.adFormSelect);
 
-    dataTimeIn.removeEventListener('change', synchronTimeIn);
-    dataTimeOut.removeEventListener('change', synchronTimeOut);
+    //  Неактивное состояние всех <fieldset> формы
+    window.util.deactivateFields(window.util.adFormFieldset);
+
+    window.image.deactivate();
+    window.image.remove();
+
+    deactivateFormFeatures();
+
+    viewTitle.removeEventListener('input', onInputValidate);
+    viewPrice.removeEventListener('input', onInputValidate);
+
+    housingType.removeEventListener('change', onTypePriceHouseChange);
+
+    dataTimeIn.removeEventListener('change', onSynchronizateTimeInChange);
+    dataTimeOut.removeEventListener('change', onSynchronizateTimeOutChange);
 
     roomNumberSelect.removeEventListener('change', onRoomNumberSelectChange);
     capacitySelect.removeEventListener('change', onCapacitySelectChange);
     window.util.adForm.removeEventListener('submit', onAdFormSubmit);
-    resetBtn.removeEventListener('click', resetBtnPage);
+    resetBtn.removeEventListener('click', onResetBtnPage);
   };
 
   window.form = {
-    activateForm: activateForm,
-    deactivateForm: deactivateForm
+    activate: activateForm,
+    deactivate: deactivateForm
   };
 })();
